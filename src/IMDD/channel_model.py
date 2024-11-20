@@ -30,10 +30,10 @@ class IMDDParams(NamedTuple):
     n_taps: int = 7
     alphabet: torch.Tensor = torch.tensor([-3., -1., 1., 3.])
     oversampling_factor: int = 3
-    baudrate: int = 100e9
+    baudrate: int = 112e9
     wavelength: float = 1270e-9
     dispersion_parameter: float = -5e-6
-    fiber_length: int = 5 * 10e3
+    fiber_length: int = 4e3
     noise_power_gain_db: float = 20.
     roll_off: float = 0.2
     bias: Optional[float] = 2.25
