@@ -1,13 +1,14 @@
 """ IM/DD channel model with PAM-4 ASK """
 
 from typing import Tuple, Optional, NamedTuple
+from dataclasses import dataclass
 import numpy as np
 import torch
 
 from .helpers import root_raised_cosine, apply_filter, chromatic_dispersion
 
-
-class IMDDParams(NamedTuple):
+@dataclass
+class IMDDParams:
     """
     :param N: The number of symbols to transmit.
     :param n_taps: The number of taps used in the demultiplexer (and demapper).
