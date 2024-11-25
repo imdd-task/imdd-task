@@ -5,7 +5,7 @@ import numpy as np
 
 
 def get_graylabel(number_bits: int) -> np.ndarray:
-    """ """
+    """ TODO: Clean """
     if number_bits == 1:
         return np.array([[0], [1]], dtype='uint8')
     label = get_graylabel(number_bits - 1)
@@ -14,6 +14,32 @@ def get_graylabel(number_bits: int) -> np.ndarray:
     upper_half = np.hstack(
         (np.ones((2**(number_bits - 1), 1), dtype='uint8'), np.flipud(label)))
     return np.vstack((lower_half, upper_half))
+
+
+def hard_decision(soft_bits: torch.Tensor) -> torch.Tensor:
+    """ TODO: Clean """
+    bits = torch.zeros_like(soft_bits)
+    bits[soft_bits >= 0] = 1
+    return bits
+
+
+def accuracy(symbols: Union[torch.Tensor, np.ndarray],
+             pred_symbols: Union[torch.Tensor, np.ndarray],
+             bit_wise: bool = False) -> np.float:
+    """ TODO: Clean """
+    if isinstance(symbols, torch.Tensor):
+        symbols = symbols.cpu().detach().numpy()
+    if isinstance(pred_symbols, torch.Tensor):
+        pred_symbols = pred_symbols.cpu().detach().numpy()
+ 
+    if bit_wise:
+        pred = hard_decision(pred_symbols)
+        return np.mean(
+            np.count_nonzero((symbols != pred).sum(1) == 0)) / symbols.shape[0]
+ 
+    return np.mean(
+        np.count_nonzero(symbols == np.argmax(pred_symbols, axis=1))) \
+        / symbols.size
 
 
 def bit_error_rate(
@@ -35,9 +61,9 @@ def bit_error_rate(
     :returns: Returns the bit error rate.
     """
     if isinstance(targets, torch.Tensor):
-        symbols = targets.detach().numpy()
+        symbols = targets.cpu().detach().numpy()
     if isinstance(pred, torch.Tensor):
-        pred = pred.detach().numpy()
+        pred = pred.cpu().detach().numpy()
 
     labels = get_graylabel(int(np.log2(pred.shape[1])))
     if bit_level:
