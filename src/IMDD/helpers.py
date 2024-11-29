@@ -25,7 +25,7 @@ def hard_decision(soft_bits: torch.Tensor) -> torch.Tensor:
 
 def accuracy(symbols: Union[torch.Tensor, np.ndarray],
              pred_symbols: Union[torch.Tensor, np.ndarray],
-             bit_wise: bool = False) -> np.float:
+             bit_wise: bool = False) -> float:
     """ TODO: Clean """
     if isinstance(symbols, torch.Tensor):
         symbols = symbols.cpu().detach().numpy()
@@ -45,7 +45,7 @@ def accuracy(symbols: Union[torch.Tensor, np.ndarray],
 def bit_error_rate(
         targets: Union[torch.Tensor, np.ndarray],
         pred: Union[torch.Tensor, np.ndarray],
-        bit_level: bool = False) -> np.float:
+        bit_level: bool = False) -> float:
     """
     Get the bit error rate (BER) between the bits in `targets` and the bits in
     `pred`. This assumes gray-labled bits.
