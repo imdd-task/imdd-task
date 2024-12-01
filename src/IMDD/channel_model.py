@@ -16,15 +16,15 @@ class IMDDParams:
         one element in the alphabet.
     :param oversampling_factor: The factor by which to up-sample, resp.
         down-sample the traces in the transmitter, resp. receiver.
-    :param baudrate: The symbol rate in Hz. This corresponds to the rate with
+    :param baudrate: The symbol rate in GBd. This corresponds to the rate with
         which the transmitter sends the symbols through the link, resp. the
         receiver samples the incoming symbols.
-    :param wavelenght: The carrier wave's wave length. This value is used to
-        compute the chromatic dispersion.
+    :param wavelength: The carrier wave's wave length in nm. This value is used
+        to compute the chromatic dispersion.
     :param dispersion_parameter: Dispersion parameter of the optical fiber
-        material, determing the dispersion, given in value s/m**2.
-    :param fiber_lenght: The assumed length of the optical fiber in m.
-    :param noise_power_gain_db: The assumed SNR in optical link in dB.
+        material, determining the dispersion, given in value ps / nm / km.
+    :param fiber_length: The assumed length of the optical fiber in km.
+    :param noise_power_db: The assumed SNR in optical link in dB.
     :param roll_off: The roll-off factor used in the root-raised cosine filter.
     """
     N: int = 10000
@@ -35,9 +35,39 @@ class IMDDParams:
     wavelength: float = 1270e-9
     dispersion_parameter: float = -5e-6
     fiber_length: int = 4e3
-    noise_power_gain_db: float = 20.
+    noise_power_db: float = 20.
     roll_off: float = 0.2
     bias: Optional[float] = 2.25
+
+
+LCDParams = IMDDParams(**{
+    "N": 10000,
+    "n_taps": 7,
+    "alphabet": torch.tensor([-3., -1., 1., 3.]),
+    "oversampling_factor": 3,
+    "baudrate": 112,
+    "wavelength": 1270,
+    "dispersion_parameter": -5,
+    "fiber_length": 4,
+    "noise_power_gain_db": 20.,
+    "roll_off": 0.2,
+    "bias": 2.25
+})
+
+
+SSMFParams = IMDDParams(**{
+    "N": 10000,
+    "n_taps": 21,
+    "alphabet": torch.tensor([0., 1., np.sqrt(2.), np.sqrt(3.)]),
+    "oversampling_factor": 3,
+    "baudrate": 50,
+    "wavelength": 1550,
+    "dispersion_parameter": -17,
+    "fiber_length": 5,
+    "noise_power_gain_db": 20.,
+    "roll_off": 0.2,
+    "bias": 0.25
+})
 
 
 class Transmitter(torch.nn.Module):
@@ -95,8 +125,9 @@ class OpticalChannel(torch.nn.Module):
         self.params = params
         self.cd_filter = chromatic_dispersion(
             params.oversampling_factor * params.N,
-            params.oversampling_factor * params.baudrate, params.wavelength,
-            params.dispersion_parameter, params.fiber_length)
+            params.oversampling_factor * params.baudrate * 1e9,
+            params.wavelength, params.dispersion_parameter * 1e-6,
+            params.fiber_length * 1e3)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """
@@ -109,7 +140,7 @@ class OpticalChannel(torch.nn.Module):
         y_cd = apply_filter(input, self.cd_filter, complex=True)
         y_pd = torch.abs(y_cd).float()**2
         noise_power = torch.sqrt(
-            torch.tensor(10**(-self.params.noise_power_gain_db / 10)))
+            torch.tensor(10**(-self.params.noise_power_db / 10)))
         y_wgn = y_pd + noise_power * torch.randn(y_pd.shape)
         return y_wgn
 
