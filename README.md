@@ -14,11 +14,11 @@ The following description is widely taken from Arnold et al (2024), to which the
   <img src="figures/comm.png" />
 </p>
 
-The goal of a communication system is to transmit a binary message $\bm{b}\in\{0,1\}^{MN}$ of length $MN$ from a transmitter to a receiver over a physical channel without error.
+The goal of a communication system is to transmit a binary message $\boldsymbol{b}\in\{0,1\}^{MN}$ of length $MN$ from a transmitter to a receiver over a physical channel without error.
 To transmit the binary message, a group of ${M=\log_2|\mathcal{X}|}$ bits is mapped to a transmit symbol ${x\in\mathcal{X}}$, where ${\mathcal{X} \subset \mathbb{R}}$ denotes the set of transmit symbols.
-Hence, transmission of $M \cdot N$ bits results in a sequence of $N$ transmits symbols ${\bm{x} \in \mathcal{X}^N}$.
-The transmit symbols $\bm{x}$ are disturbed by the channel, resulting in the channel output ${\bm{y} \in \mathbb{C}^N}$. 
-Based on the observation of $\bm{y}$, the receiver outputs an estimate of the transmit bit sequence $\hat{\bm{b}}$. The metric to classify the performance of the communication system is the BER:
+Hence, transmission of $M \cdot N$ bits results in a sequence of $N$ transmits symbols ${\boldsymbol{x} \in \mathcal{X}^N}$.
+The transmit symbols $\boldsymbol{x}$ are disturbed by the channel, resulting in the channel output ${\boldsymbol{y} \in \mathbb{C}^N}$. 
+Based on the observation of $\boldsymbol{y}$, the receiver outputs an estimate of the transmit bit sequence $\hat{\boldsymbol{b}}$. The metric to classify the performance of the communication system is the BER:
 ```math
 \mathrm{BER} = \frac{1}{MN} \sum_{n=0}^{MN-1} 1\left( b_n \neq \hat{b}_n \right) \quad \text{with}\quad 1\left( b_n \neq \hat{b}_n \right) = \begin{cases}
         0 \quad &\text{if} \quad b_n = \hat{b}_n\, , \\
@@ -41,7 +41,7 @@ We denote the bits mapped to $x[k]$ as $b_1[k]$ and $b_2[k]$:
 |---|:-:|:-:|---|---|
 | $b_1[k]\,b_2[k]$ | 00  | 01 | 11 | 10 |
 
-The transmit sequence $\bm{x}$ is converted into a continuous-time signal, which is modulated onto the laser intensity.
+The transmit sequence $\boldsymbol{x}$ is converted into a continuous-time signal, which is modulated onto the laser intensity.
 Then, the modulated light is coupled to the optical fiber.
 Inside the fiber, the frequency-dependent propagation speed results in chromatic dispersion (CD), and the symbols experience dispersion in the time domain.
 Hence, consecutive symbols overlap and interfere, yielding the so-called inter-symbol interference (ISI).
@@ -56,9 +56,9 @@ In summary, we can write
 
 where $f(\cdot): \mathcal{X}^{n_{\mathrm{ISI}}}\rightarrow \mathbb{R}$ is an arbitrary function modeling both ISI and the non-linear distortion; $n[k]$ models the AWGN.
 
-After the PD, the sequence of received values $\bm{y}$ is sampled over time.
-The sequence $\bm{y}$ is passed to the receiver, which implements both channel equalization and demapping.
-The receiver tries to mitigate the impact of the IM/DD link and recover the transmit bits $\bm{\hat{b}}$.
+After the PD, the sequence of received values $\boldsymbol{y}$ is sampled over time.
+The sequence $\boldsymbol{y}$ is passed to the receiver, which implements both channel equalization and demapping.
+The receiver tries to mitigate the impact of the IM/DD link and recover the transmit bits $\boldsymbol{\hat{b}}$.
 For a more detailed description of the implementation of the IM/DD link, the interested reader is referred to [1].
 
 To ensure reliable transmission in practical systems, at the output of the receiver, a target BER is defined.
@@ -151,7 +151,7 @@ This allows shuffling and batching along the first dimension using a PyTorch `Da
 Each transmit symbol is labeled with its assigned bits, generated using the provided `get_graylabels` function, and accessed at the corresponding index `q`.
 By default, the dataset does not directly return bit-level labels to maintain flexibility.
 This design supports symbol-level receivers, allowing models to output class index $\hat{q}$ corresponding to the predicted symbol $\hat{x} \in \mathcal{X}$, which can be used together with $q$ in a cross-entropy loss function.
-For tasks requiring bit-level outputs, setting `bit_level=True` in the dataset configuration changes the format of $\bm{q}$ to `(N, 2)`, where each entry contains binary values corresponding to the respective bits.
+For tasks requiring bit-level outputs, setting `bit_level=True` in the dataset configuration changes the format of $\boldsymbol{q}$ to `(N, 2)`, where each entry contains binary values corresponding to the respective bits.
 To compute the BER based on either predicted symbols or bits, we provide a helper function `bit_error_rate`.
 
 An arbitrarily parameterized IM/DD link can be created by passing an instance of `IMDDParams` to an `IMDDModel`.
