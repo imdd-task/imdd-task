@@ -104,7 +104,7 @@ The IM/DD link suffers from severe ISI, increasing the number of required input 
 |---|:-:|
 | `N` | 10000 |
 | `n_taps` | 21 |
-| `alphabet` | $\left[0, 1, \sqrt{2}, \sqrt{3}\right]$ |
+| `alphabet` | [0, 1, $\sqrt{2}$, $\sqrt{3}$] |
 | `oversampling_factor` | 3 |
 | `baudrate` | 50 GBd |
 | `wavelength` | 1550 mn |
