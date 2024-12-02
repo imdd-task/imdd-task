@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "IMDD"
+authors = [
+  { name="Electronic Vision(s)", email="visions-dev@kip.uni-heidelberg.de" },
+]
+description = "The IMDD package provides an IM/DD channel implementation and two predefined dataset for training demappers / equalizers"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+version = "1.0.0"
+dependencies = [
+  "torch==2.0.0",
+  "numpy>=1.23.5",
+  "matplotlib>=3.7.1"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/electronicvisions/imdd-task"
+"Bug Tracker" = "https://github.com/electronicvisions/imdd-task/issues"
+
+[tool.setuptools.packages.find]
+where = ["src/IMDD"]

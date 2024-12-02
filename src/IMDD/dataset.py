@@ -2,8 +2,8 @@
 from typing import Any, Union, Tuple, List
 import torch
 import numpy as np
-from .helpers import get_graylabel
-from .channel_model import IMDDModel, IMDDParams
+from IMDD.helpers import get_graylabel
+from IMDD.model import IMDDModel, IMDDParams, LCDParams, SSMFParams
 from torch.utils.data import Dataset
 
 
@@ -11,7 +11,7 @@ class IMDDDataset(Dataset):
     """ Dataset for demapping an IM/DD link with PAM-4 """
 
     def __init__(self, params: IMDDParams, bit_level: bool = False,
-                 continuos_sampling: bool = True) -> None:
+                 continuous_sampling: bool = True) -> None:
         """
         :param params: The IM/DD model parameter set.
         :param bit_level: Bool indicating whether the targets are on
@@ -70,10 +70,10 @@ class IMDDDataset(Dataset):
 
 
 class LCDDataset(IMDDDataset):
-    def __init__(self, params: IMDDParams, bit_level: bool = False) -> None:
-        super.__init__(params=LCDParams, bit_level=bit_level)
+    def __init__(self, bit_level: bool = False) -> None:
+        super().__init__(params=LCDParams, bit_level=bit_level)
 
 
 class SSMFDataset(IMDDDataset):
-    def __init__(self, params: IMDDParams, bit_level: bool = False) -> None:
-        super.__init__(params=SSMFParams, bit_level=bit_level)
+    def __init__(self, bit_level: bool = False) -> None:
+        super().__init__(params=SSMFParams, bit_level=bit_level)

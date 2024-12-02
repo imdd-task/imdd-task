@@ -5,7 +5,8 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from .helpers import root_raised_cosine, apply_filter, chromatic_dispersion
+from IMDD.helpers import root_raised_cosine, apply_filter, chromatic_dispersion
+
 
 @dataclass
 class IMDDParams:
@@ -31,11 +32,11 @@ class IMDDParams:
     n_taps: int = 7
     alphabet: torch.Tensor = torch.tensor([-3., -1., 1., 3.])
     oversampling_factor: int = 3
-    baudrate: int = 112e9
-    wavelength: float = 1270e-9
-    dispersion_parameter: float = -5e-6
-    fiber_length: int = 4e3
-    noise_power_db: float = 20.
+    baudrate: int = 112
+    wavelength: float = 1270
+    dispersion_parameter: float = -5
+    fiber_length: int = 4
+    noise_power_db: float = -20.
     roll_off: float = 0.2
     bias: Optional[float] = 2.25
 
@@ -49,7 +50,7 @@ LCDParams = IMDDParams(**{
     "wavelength": 1270,
     "dispersion_parameter": -5,
     "fiber_length": 4,
-    "noise_power_gain_db": 20.,
+    "noise_power_db": -20.,
     "roll_off": 0.2,
     "bias": 2.25
 })
@@ -64,7 +65,7 @@ SSMFParams = IMDDParams(**{
     "wavelength": 1550,
     "dispersion_parameter": -17,
     "fiber_length": 5,
-    "noise_power_gain_db": 20.,
+    "noise_power_db": -20.,
     "roll_off": 0.2,
     "bias": 0.25
 })
@@ -126,7 +127,7 @@ class OpticalChannel(torch.nn.Module):
         self.cd_filter = chromatic_dispersion(
             params.oversampling_factor * params.N,
             params.oversampling_factor * params.baudrate * 1e9,
-            params.wavelength, params.dispersion_parameter * 1e-6,
+            params.wavelength * 1e-9, params.dispersion_parameter * 1e-6,
             params.fiber_length * 1e3)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
@@ -140,7 +141,7 @@ class OpticalChannel(torch.nn.Module):
         y_cd = apply_filter(input, self.cd_filter, complex=True)
         y_pd = torch.abs(y_cd).float()**2
         noise_power = torch.sqrt(
-            torch.tensor(10**(-self.params.noise_power_db / 10)))
+            torch.tensor(10**(self.params.noise_power_db / 10)))
         y_wgn = y_pd + noise_power * torch.randn(y_pd.shape)
         return y_wgn
 
