@@ -2,18 +2,18 @@
 requires = ["setuptools"]
 
 [project]
-name = "IMDD"
+name = "imdd-task"
 authors = [
   { name="Electronic Vision(s)", email="visions-dev@kip.uni-heidelberg.de" },
 ]
-description = "The IMDD package provides an IM/DD channel implementation and two predefined dataset for training demappers / equalizers"
+escription = "The IMDD Task package provides an IM/DD channel implementation and two predefined dataset for training demappers / equalizers"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-version = "1.0.0"
+version = "0.0.1"
 dependencies = [
   "torch==2.0.0",
   "numpy>=1.23.5",
