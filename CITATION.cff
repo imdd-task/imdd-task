@@ -1,0 +1,54 @@
+cff-version: 1.2.0
+title: >-
+  Short-reach Optical Communications: A Real-world Task for
+  Neuromorphic Hardware
+message: >-
+  If you use this dataset, please cite it using the metadata
+  from this file.
+type: dataset
+authors:
+  - given-names: Elias
+    family-names: Arnold
+  - given-names: Eike-Manuel
+    family-names: Edelmann
+  - given-names: Alexander
+    family-names: von Bank
+  - given-names: Eric
+    family-names: Müller
+  - given-names: Laurent
+    family-names: Schmalen
+  - given-names: Johannes
+    family-names: Schemmel
+identifiers:
+  - type: doi
+    value: 10.48550/arXiv.2412.03129
+    description: Preprint
+repository-code: 'https://github.com/imdd-task/imdd-task'
+url: 'https://github.com/imdd-task/imdd-task'
+abstract: >-
+  Spiking neural networks (SNNs) emulated on dedicated
+  neuromorphic accelerators promise to offer
+  energy-efficient signal processing. However, the
+  neuromorphic advantage over traditional algorithms still
+  remains to be demonstrated in real-world applications.
+  Here, we describe an intensity-modulation,
+  direct-detection (IM/DD) task that is relevant to
+  high-speed optical communication systems used in data
+  centers. Compared to other machine learning-inspired
+  benchmarks, the task offers several advantages. First, the
+  dataset is inherently time-dependent, i.e., there is a
+  time dimension that can be natively mapped to the dynamic
+  evolution of SNNs. Second, small-scale SNNs can achieve
+  the target accuracy required by technical communication
+  standards. Third, due to the small scale and the defined
+  target accuracy, the task facilitates the optimization for
+  real-world aspects, such as energy efficiency, resource
+  requirements, and system complexity.
+keywords:
+  - dataset
+  - benchmark
+  - neuromorphic
+  - event-based
+  - optical communication
+version: 0.0.1
+date-released: '2024-12-04'
