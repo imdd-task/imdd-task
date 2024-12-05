@@ -21,8 +21,8 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/electronicvisions/imdd-task"
-"Bug Tracker" = "https://github.com/electronicvisions/imdd-task/issues"
+"Homepage" = "https://github.com/imdd-task/imdd-task"
+"Bug Tracker" = "https://github.com/imdd-task/imdd-task/issues"
 
 [tool.setuptools.packages.find]
 where = ["src/IMDD"]
