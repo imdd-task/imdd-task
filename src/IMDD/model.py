@@ -1,8 +1,6 @@
 """ IM/DD channel model with PAM-4 ASK """
-
 from typing import Tuple, Optional, NamedTuple
 from dataclasses import dataclass
-import numpy as np
 import torch
 
 from IMDD.helpers import root_raised_cosine, apply_filter, chromatic_dispersion
@@ -41,34 +39,29 @@ class IMDDParams:
     bias: Optional[float] = 2.25
 
 
-LCDParams = IMDDParams(**{
-    "N": 10000,
-    "n_taps": 7,
-    "alphabet": torch.tensor([-3., -1., 1., 3.]),
-    "oversampling_factor": 3,
-    "baudrate": 112,
-    "wavelength": 1270,
-    "dispersion_parameter": -5,
-    "fiber_length": 4,
-    "noise_power_db": -20.,
-    "roll_off": 0.2,
-    "bias": 2.25
-})
+@dataclass
+class LCDParams(IMDDParams):
+    """ IM/DD parameters for LCD-Task """
+    n_taps: int = 7
+    alphabet: torch.Tensor = torch.tensor([-3., -1., 1., 3.])
+    baudrate: int = 112
+    wavelength: float = 1270.
+    dispersion_parameter: float = -5
+    fiber_length: int = 4
+    bias: Optional[float] = 2.25
 
 
-SSMFParams = IMDDParams(**{
-    "N": 10000,
-    "n_taps": 21,
-    "alphabet": torch.tensor([0., 1., np.sqrt(2.), np.sqrt(3.)]),
-    "oversampling_factor": 3,
-    "baudrate": 50,
-    "wavelength": 1550,
-    "dispersion_parameter": -17,
-    "fiber_length": 5,
-    "noise_power_db": -20.,
-    "roll_off": 0.2,
-    "bias": 0.25
-})
+@dataclass
+class SSMFParams(IMDDParams):
+    """ IM/DD parameters for SSMF-Task """
+    n_taps: int = 21
+    alphabet: torch.Tensor = torch.tensor(
+        [0., 1., torch.sqrt(torch.tensor(2.)), torch.sqrt(torch.tensor(3.))])
+    baudrate: int = 50
+    wavelength: float = 1550.
+    dispersion_parameter: float = -17
+    fiber_length: int = 5
+    bias: Optional[float] = 0.25
 
 
 class Transmitter(torch.nn.Module):
@@ -88,9 +81,10 @@ class Transmitter(torch.nn.Module):
         """
         The transmitter gets the message sequence (as integers) to be send
         through the optical link. The bits are mapped to their corresponding
-        symbol, up-sampled, filtered wiht a root-raised cosine filter, biased
-        and normalized. This implements the E/O, i.e. the modulation onto the
-        carrier wave..
+        symbol in the given alphabet, up-sampled, filtered with a root-raised
+        cosine filter, biased and normalized. This implements the E/O, i.e. the
+        modulation onto the carrier wave.
+
         :param input: The integer sequence of shape (N,) to be send. Each entry
             is mapped to one symbol in the alphabet and represents the bits to
             be transmitted.
@@ -118,12 +112,14 @@ class Transmitter(torch.nn.Module):
 class OpticalChannel(torch.nn.Module):
     """ Class implementing the optical fiber channel model """
 
-    def __init__(self, params: IMDDParams):
+    def __init__(self, params: IMDDParams, rng: torch.Generator):
         """
         :param params: Parameter object prameterizing the IM/DD model.
+        :param rng: Random generator to generate noise.
         """
         super().__init__()
         self.params = params
+        self.rng = rng
         self.cd_filter = chromatic_dispersion(
             params.oversampling_factor * params.N,
             params.oversampling_factor * params.baudrate * 1e9,
@@ -133,16 +129,17 @@ class OpticalChannel(torch.nn.Module):
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         """
         The channel gets the symbols to be send from the transmitter and then
-        adds chromatic dispersion. The measurement by the photodiode is
+        adds chromatic dispersion. The measurement by the photo diode is
         implemented by a absolute square on the output of the fiber.
+
         :param input: The sequence of symbols to be send through the fiber.
-        :returns: The symbols measured by the photodiode.
+        :returns: The symbols measured by the photo diode.
         """
         y_cd = apply_filter(input, self.cd_filter, complex=True)
-        y_pd = torch.abs(y_cd).float()**2
+        y_pd = torch.abs(y_cd)**2
         noise_power = torch.sqrt(
             torch.tensor(10**(self.params.noise_power_db / 10)))
-        y_wgn = y_pd + noise_power * torch.randn(y_pd.shape)
+        y_wgn = y_pd + noise_power * torch.randn(y_pd.shape, generator=self.rng)
         return y_wgn
 
 
@@ -163,7 +160,7 @@ class Receiver(torch.nn.Module):
             -> Tuple[torch.Tensor]:
         """
         The receiver applies a root-raised-cosine and down-samples the signal
-        for simulating the sampling od the electrical signal after the O/E.
+        for simulating the sampling of the electrical signal after the O/E.
 
         :param input: The signal form the optical channel.
         :returns: The sampled signal multiplexed into shape (N, n_taps)
@@ -191,14 +188,20 @@ class IMDDModel(torch.nn.Module):
     IM/DD model consisting of a Transmitter, optical Channel, and Receiver
     """
 
-    def __init__(self, params: IMDDParams):
+    def __init__(self, params: IMDDParams, seed: int = 0,
+                 device: torch.device = "cpu"):
         """
         :param params: Parameter object holding the model's parameters.
+        :param seed: Random seed to random generator for sampling symbols to
+            send and generating noise in the link.
+        :param device: The device to operate on. Either "cpu" or "cuda".
         """
         super().__init__()
+        self.rng = torch.Generator(device=device)
+        self.rng.manual_seed(seed)
         self.params = params
         self.transmitter = Transmitter(params)
-        self.channel = OpticalChannel(params)
+        self.channel = OpticalChannel(params, self.rng)
         self.receiver = Receiver(params)
 
     def extra_repr(self):
@@ -208,17 +211,20 @@ class IMDDModel(torch.nn.Module):
     def source(self) -> torch.Tensor:
         """
         Generate a sequence of messages to send through the channel.
+
         :returns: A tensor containing a the indices of the message in the used
             alphabet randomly drawn.
         """
-        message = torch.tensor(np.random.choice(
-            range(len(self.params.alphabet)), self.params.N)).long()
+        p = torch.ones(len(self.params.alphabet)) / len(self.params.alphabet)
+        message = p.multinomial(
+            self.params.N, replacement=True, generator=self.rng)
         return message
 
     def forward(self, input: torch.Tensor) -> Tuple[torch.Tensor]:
         """
-        Send a sequence of messages through the IM/DD channel model.
-        :param data: The sequence of messanges to be transmitted through the
+        Sends a sequence of messages through the IM/DD channel model.
+    
+        :param input: The sequence of messages to be transmitted through the
             model.
         :returns: Returns the sequence of the received symbols by the model's
             receiver.
