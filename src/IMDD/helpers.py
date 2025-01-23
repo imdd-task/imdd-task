@@ -1,7 +1,6 @@
 """ Helper functions """
 from typing import Union
 import torch
-import numpy as np
 
 
 def get_graylabel(M_bits: int) -> torch.Tensor:

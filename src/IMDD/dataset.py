@@ -1,7 +1,6 @@
 """ IM/DD Dataset """
 from typing import Any, Union, Tuple, List, Optional
 import torch
-import numpy as np
 from IMDD.helpers import get_graylabel
 from IMDD.model import IMDDModel, IMDDParams, LCDParams, SSMFParams
 from torch.utils.data import Dataset
