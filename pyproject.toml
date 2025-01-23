@@ -25,4 +25,4 @@ dependencies = [
 "Bug Tracker" = "https://github.com/imdd-task/imdd-task/issues"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["src/IMDD"]
