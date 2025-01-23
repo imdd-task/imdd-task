@@ -15,7 +15,8 @@ classifiers = [
 ]
 version = "0.0.1"
 dependencies = [
-  "torch==2.0.0",
+  "torch>=2.3.0",
+  "torchvision>=0.18",
   "numpy>=1.23.5",
   "matplotlib>=3.7.1"
 ]
