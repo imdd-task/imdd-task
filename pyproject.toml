@@ -6,7 +6,7 @@ name = "imdd-task"
 authors = [
   { name="Electronic Vision(s)", email="visions-dev@kip.uni-heidelberg.de" },
 ]
-escription = "The IMDD Task package provides an IM/DD channel implementation and two predefined dataset for training demappers / equalizers"
+description = "The IMDD Task package provides an IM/DD channel implementation and two predefined dataset for training demappers / equalizers"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
