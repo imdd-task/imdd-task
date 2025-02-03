@@ -15,8 +15,14 @@ classifiers = [
 ]
 version = "0.0.1"
 dependencies = [
+<<<<<<< HEAD
   "torch==2.0.0",
   "numpy<2",
+=======
+  "torch>=2.3.0",
+  "torchvision>=0.18",
+  "numpy>=1.23.5",
+>>>>>>> 5d105e11451962c642aa0f80be9d1c4674fb5456
   "matplotlib>=3.7.1"
 ]
 
@@ -25,4 +31,8 @@ dependencies = [
 "Bug Tracker" = "https://github.com/imdd-task/imdd-task/issues"
 
 [tool.setuptools.packages.find]
+<<<<<<< HEAD
 where = ["src"]
+=======
+where = ["src/IMDD"]
+>>>>>>> 5d105e11451962c642aa0f80be9d1c4674fb5456
