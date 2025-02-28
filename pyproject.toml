@@ -17,7 +17,8 @@ version = "0.0.1"
 dependencies = [
   "torch==2.0.0",
   "numpy<2",
-  "matplotlib>=3.7.1"
+  "norse==1.1.0",
+  "matplotlib>=3.7.1",
 ]
 
 [project.urls]
