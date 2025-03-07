@@ -99,11 +99,14 @@ class LCDDataset(IMDDDataset):
                  seed: Optional[int] = None) -> None:
         super().__init__(
             params=LCDParams(), bit_level=bit_level,
-            continuous_sampling=continuous_sampling, seed=seed)
+            continuous_sampling=continuous_sampling, train=train, seed=seed)
+
 
 class SSMFDataset(IMDDDataset):
     """ Dataset for SSMF-Task """
     def __init__(self, bit_level: bool = False,
                  continuous_sampling: bool = True, train: bool = True,
                  seed: Optional[int] = None) -> None:
-        super().__init__(params=SSMFParams(), bit_level=bit_level, continuous_sampling=continuous_sampling, seed=seed)
+        super().__init__(
+            params=SSMFParams(), bit_level=bit_level,
+            continuous_sampling=continuous_sampling, train=train, seed=seed)
